@@ -10,12 +10,12 @@
 // считать период запросов: задать 3-4 переменные под миллис, считать средние периоды запросов, округлить до целого, отсортировать, определить количество разных 
 // задавать запросы по рассчитанным таймерам, распределяя внутри таймера равномерно запросы
 // через 10 секунд или минимум 3 повторений всех запросов определить максимальный период повторений запросов, перейти в режим, при котором при наличии паузы в два максимальных режима автоматически перейти в режим WORK MODE
-//#define MASTER
+#define MASTER
 //#define KATOD
-#define ANOD
+//#define ANOD
 //#define SLAVE
 //#define SHOWOLED
-#define MSTN100
+#define ARDUINO
 #define ADDRESS 0 //0 1 2 - адрес контроллера (SLAVE)
 const unsigned long baud=57600; 	// минимум 1200, иначе таймеры сделать лонгами
 const int TimerZaprosTime=3000;       // (мс) период запроса данных MASTERом
@@ -37,7 +37,6 @@ int t1s5, t3s5; // задаются в setup() в зависимости от с
   #define RXTX_PIN1 6
   #define RXTX_PIN2 8
 #endif
-
 
 #ifndef MSTN100
 #include <GyverTimer.h>
@@ -326,38 +325,29 @@ const int maxlenzap=10; // максимальная длина запроса в
 const int maxlenotv=256; // длина ответа в символах (он же буфер для чтения порта)
 char strzap[maxlenzap]="";
 char char1, char2; // символы для чтения из компорта1 и компорта2 соответственно
-bool flag1, flag2; // флаг, что символ считан из компорта и сохранён в char1 или char2 соответственно. Флаг сбрасывется, когда считанный символ обработан.
 
-#if defined(KATOD) || defined(ANOD)
-  const int maxzapros=15; // сколько максимально всего разных запросов может поступить, включая те, на которые нет ответов
-  char   zp[maxzapros][maxlenzap]; // массив для хранения строк запросов
-  unsigned char  zplen[maxzapros]; // массив для хранения длины каждого запроса
-  unsigned int zpcount[maxzapros]; // массив для хранения количества повторений запросов
+const int maxzapros=15; // сколько максимально всего разных запросов может поступить, включая те, на которые нет ответов
+char   zp[maxzapros][maxlenzap]; // массив для хранения строк запросов
+unsigned char  zplen[maxzapros]; // массив для хранения длины каждого запроса
+unsigned int zpcount[maxzapros]; // массив для хранения количества повторений запросов
 //  int curnumzp=0;       // текущий номер запроса/ответа
-  int kolzp=0;          // сколько разных запросов, не должен превышать maxzapros!!!
-  int zpcountmax=0;     // подсчёт максимального количества повторений запросов
-  const int zpcountready=3; // количество повторений запросов, чтобы зажечь зел. СД
-  const int zpcountmin=2; // сколько раз должен быть получен запрос, чтобы стать легетимным и работать в АНОДе в рабочем режиме. 2-значит запрос получен 2 раза, то есть был 1 повтор.
-  bool flag1=false, flag2=false; // флаг, что считан байт из порта 1 или 2 соответственно. После использования значения флаг сбрасывается
-  char char1,char2; // для считывания из портов
-  int zapnum=0; // номер запроса в массиве
+int kolzp=0;          // сколько разных запросов, не должен превышать maxzapros!!!
+int zpcountmax=0;     // подсчёт максимального количества повторений запросов
+const int zpcountready=3; // количество повторений запросов, чтобы зажечь зел. СД
+const int zpcountmin=2; // сколько раз должен быть получен запрос, чтобы стать легетимным и работать в АНОДе в рабочем режиме. 2-значит запрос получен 2 раза, то есть был 1 повтор.
+bool flag1=false, flag2=false; // флаг, что считан байт из порта 1 или 2 соответственно. После использования значения флаг сбрасывается
+int zapnum=0; // номер запроса в массиве
 
-#endif
-#ifdef KATOD 
-  bool Flag_Prestore_Otvet=false; // если флаг тру, то в режиме обучения ответы сохраняются, тогда при переключении в работу на запросы уже будут готовые ответы, иначе несколько запросов могут выпасть по таймауту, пока анод не соберёт/передаст ответы
-  char str2[maxlenotv]="";// для считывания катодом ответа от анода в WORK (LEARN) режиме: посылает запрос и ответ подряд
-  const int   maxotvet=maxzapros; // максимальное количество ответов которое может быть от контроллера 3фун * 5 (по 100 регистров) = 15 ответов
-  char otvet[maxotvet][maxlenotv]; 
-  unsigned int  otvlen[maxotvet]; 
-  int zapnum2=0; // номер запроса в массиве
-  int meslen2=0; // номер запроса в массиве
 
-#endif
-#ifdef ANOD
-  unsigned long timezp[maxzapros];   // время [мс] когда пришёл последний запрос
-  unsigned long periodzp[maxzapros]; // минимальный период запроса - определяются при обучении, используются в рабочем режиме
-#endif
+char str2[maxlenotv]="";// для считывания катодом ответа от анода в WORK (LEARN) режиме: посылает запрос и ответ подряд
 
+bool Flag_Prestore_Otvet=false; // если флаг тру, то в режиме обучения ответы сохраняются, тогда при переключении в работу на запросы уже будут готовые ответы, иначе несколько запросов могут выпасть по таймауту, пока анод не соберёт/передаст ответы
+const int   maxotvet=maxzapros; // максимальное количество ответов которое может быть от контроллера 3фун * 5 (по 100 регистров) = 15 ответов
+char otvet[maxotvet][maxlenotv]; 
+unsigned int  otvlen[maxotvet]; 
+int zapnum2=0; // номер запроса в массиве
+unsigned long timezp[maxzapros];   // время [мс] когда пришёл последний запрос
+unsigned long periodzp[maxzapros]; // минимальный период запроса - определяются при обучении, используются в рабочем режиме
 
 #define OVERFLOW_KOL_ZAPROS 1 //код ошибки переполнения количества разных запросов для массива хранения запросов
 #define OVERFLOW_LONG_OTVET 2 //код ошибки переполнения длины ответа (посылки модбас)
@@ -840,7 +830,7 @@ if ( knopka_prep && !knopka) {/* триггер на отпускание кно
 #endif // ############################################ MASTER ###############################
 }
 
-int savenewzapros(str,mlen) 
+int savenewzapros(char *str, int mlen) 
 		{ int zapn=-1; // -1 если массив закончился
 		  if (kolzp<maxzapros) // если запрос новый (не найден в списке сохранённых) и их количество не превышает массив, то сохраняем его
 	           { 
@@ -864,7 +854,7 @@ int savenewzapros(str,mlen)
 		}
 
 
-int findzapros(char * str, int mlen);
+int findzapros(char * str, int mlen)
 { int zapn=-1;
 	        for (int i=0; i<kolzp; i++) 
 	          { // ищем в сохранённых запросах 
@@ -932,10 +922,10 @@ void SHOWERROR(int ERRORNUMBER)
   #endif
 }
 
-void UpdateZaprosTimer(zapn)
+void UpdateZaprosTimer(int zapn, period)
 {
-   if (zpcount[zapn]==2) period[zapn]=periodtime(timezp[zapn],millis());
-   if ( (zpcount[zapn]>2) && (periodtime(timezp[zapn],millis())<periodzp[zapn]) ) period[zapn]=periodtime(timezp[zapn],millis());
+   if (zpcount[zapn]==2) period[zapn]=periodtime(timezp[zapn],millis())
+   if ( (zpcount[zapn]>2) && (periodtime(timezp[zapn],millis())<periodzp[zapn]) ) period[zapn]=periodtime(timezp[zapn],millis())
    timezp[zapn]=millis();
 }
 

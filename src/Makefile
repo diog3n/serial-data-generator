@@ -1,12 +1,8 @@
-default:
-	g++ *.cpp -g -O0 -fno-omit-frame-pointer -fno-optimize-sibling-calls -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1 -fsanitize=address -std=c++17 -o ../executables/main -Wfatal-errors -Wall 
-debug:
-	g++ *.cpp -g -O0 -fno-omit-frame-pointer -fno-optimize-sibling-calls -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1 -fsanitize=address -std=c++17 -o ../executables/main -Wfatal-errors -Wall
-debug-run:
-	g++ *.cpp -g -O0 -fno-omit-frame-pointer -fno-optimize-sibling-calls -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_LIBCPP_DEBUG=1 -fsanitize=address -std=c++17 -o ../executables/main -Wfatal-errors -Wall
-	../executables/main
-release:
-	g++ *.cpp -O1 -std=c++17 -o ../executables/main -Wfatal-errors -Wall
-
-release-run:
-	g++ *.cpp -O1 -std=c++17 -o ../executables/main -Wfatal-errors -Wall
+debug-rd:
+	gcc serial_reader.c utils.c -g -std=c11 -fsanitize=address -lc -o serial_reader
+release-rd:
+	gcc serial_reader.c utils.c -std=c11 -lc -o serial_reader
+debug-wr:
+	gcc serial_writer.c utils.c -g -std=c11 -fsanitize=address -lc -o serial_writer
+release-wr:
+	gcc serial_writer.c utils.c -std=c11 -lc -o run serial_writer
